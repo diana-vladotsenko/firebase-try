@@ -1,0 +1,59 @@
+<html><head>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+    import { getDatabase, ref, onValue, set, child } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+  
+    import firebaseConfig from "./config.js"; 
+  
+  
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase();
+    const koht = ref(db, "/positions");
+  
+    //reset function
+    window.reset = function() {
+      document.getElementById('username').value = '';
+      document.getElementById('words').value = '';
+    }
+  
+    onValue(koht, kuva)
+        function kuva(viit){
+            let sisu=viit.val();
+            console.log(sisu);
+            window.document.getElementById('kiht').innerHTML=(sisu instanceof String) ?
+              sisu : JSON.stringify(sisu);
+            let g = board.getContext("2d");
+            g.clearRect(0, 0, 500, 300);
+            for(let username of Object.keys(sisu)){
+               let asukoht = sisu[username];
+               g.fillText(username, asukoht.x, asukoht.y);
+               if(asukoht.teade){
+                 g.fillText(asukoht.teade, asukoht.x+5, asukoht.y+12);
+               }
+            }
+        }
+  
+    window.change = function(e, k){  
+      console.log(e, k, e.clientX);
+      set(child(koht, k), {x: event.offsetX, y: event.offsetY, teade: words.value});
+    }
+  </script>
+  </head>
+  
+  <body>
+    <h3>Kodutöö</h3>
+    Nimi:<input type="text" id="username" value="Nimi" placeholder="Your name..">
+    <br>
+    Teade:<input type="text" id="words" value="Teade" placeholder="Write something here..">
+    <p>Position:</p> 
+    <div id="kiht"> Kiht: </div>
+    <div style="margin:20px;">
+      <canvas width="500" height="300" style="border: 1px solid black;" id="board" onclick="change(event, username.value)"></canvas>
+      <br/>
+    </div>
+    <div>
+      <input type="submit" value="Reset" onclick="reset()">
+    </div>
+  </body>
+  </html>
+  
